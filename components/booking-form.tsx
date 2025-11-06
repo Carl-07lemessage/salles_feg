@@ -138,7 +138,7 @@ export function BookingForm({ room }: BookingFormProps) {
             <Label htmlFor="name">Nom complet *</Label>
             <Input
               id="name"
-              placeholder="Mr/Mme..."
+              placeholder="Jean Dupont"
               value={formData.customerName}
               onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
               required
@@ -151,7 +151,7 @@ export function BookingForm({ room }: BookingFormProps) {
             <Input
               id="email"
               type="email"
-              placeholder="jean.@example.com"
+              placeholder="jean.dupont@example.com"
               value={formData.customerEmail}
               onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
               required
@@ -178,7 +178,7 @@ export function BookingForm({ room }: BookingFormProps) {
                   variant="outline"
                   className={cn("w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground")}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4 " />
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <>

@@ -104,6 +104,17 @@ export function RoomForm({ room }: RoomFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (formData.price_per_day > 99999999) {
+      toast.error("Le prix par jour ne peut pas dépasser 99,999,999 FCFA")
+      return
+    }
+
+    if (formData.price_per_day < 0) {
+      toast.error("Le prix par jour doit être positif")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -182,12 +193,14 @@ export function RoomForm({ room }: RoomFormProps) {
                 id="price"
                 type="number"
                 min="0"
+                max="99999999"
                 step="1"
                 placeholder="Ex: 150000"
                 value={formData.price_per_day || ""}
                 onChange={(e) => setFormData({ ...formData, price_per_day: Number.parseFloat(e.target.value) || 0 })}
                 required
               />
+              <p className="text-xs text-muted-foreground">Maximum: 99,999,999 FCFA</p>
             </div>
           </div>
 

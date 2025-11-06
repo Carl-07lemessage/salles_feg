@@ -18,7 +18,7 @@ export function RoomCard({ room }: RoomCardProps) {
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-border/50 bg-card h-full flex flex-col">
       <div className="relative h-64 w-full bg-muted overflow-hidden">
         <Image
-          src={room.image_url ? getDirectImageUrl(room.image_url) : "/feg.png"}
+          src={room.image_url ? getDirectImageUrl(room.image_url) : "/placeholder.svg"}
           alt={room.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"

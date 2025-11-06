@@ -105,7 +105,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
+     * - api/upload-room-image (allow uploads without middleware auth check)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/upload-room-image|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
