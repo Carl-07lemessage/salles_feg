@@ -32,43 +32,37 @@ export default async function HomePage() {
   const rooms = await getRooms()
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <Image src="/logo-feg.png" alt="FEG Logo" width={180} height={48} className="h-12 w-auto" priority />
-            </Link>
-            <Button
-              asChild
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary/10 bg-transparent font-semibold"
-            >
-              <Link href="/admin/auth">Espace Administrateur</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-accent/20 to-white">
 
-      <section className="border-b border-border/30 bg-gradient-to-b from-accent/10 via-accent/5 to-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,140,100,0.05),transparent_50%)]" />
-        <div className="container mx-auto px-4 py-20 md:py-28 relative">
-          <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-semibold text-primary shadow-sm">
-              <Building2 className="h-4 w-4" />
-              <span>Fédération des Entreprises du Gabon</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance leading-[1.1] text-foreground">
-              Location de Salles
-              <span className="block text-primary mt-2">Professionnelles</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl text-balance leading-relaxed font-light">
-              Découvrez nos espaces modernes et parfaitement équipés, conçus pour répondre à tous vos besoins
-              professionnels. Réservation simple et sécurisée.
-            </p>
-          </div>
-        </div>
-      </section>
+
+<section
+  className="relative  overflow-hidden"
+>
+  {/*Image d’arrière-plan*/}
+  <img
+    src="/logo-feg.png"
+    alt="FEG Logo"
+    className="absolute inset-0 w-full h-full mt-4 object-contain opacity-10 pointer-events-none"
+  />
+
+  {/* Contenu principal */}
+  <div className="relative container mx-auto px-4 py-16 md:py-24">
+    <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
+      <div className="inline-flex items-center gap-2 rounded-[10px] border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
+        <Building2 className="h-4 w-4" />
+        <span>Fédération des Entreprises du Gabon</span>
+      </div>
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-tight text-primary">
+        Location de Salles Professionnelles
+      </h1>
+      <p className="text-lg md:text-xl text-foreground/70 max-w-2xl text-balance leading-relaxed">
+        Découvrez nos espaces modernes et parfaitement équipés, conçus pour répondre à tous vos besoins
+        professionnels. Réservation simple et sécurisée.
+      </p>
+    </div>
+  </div>
+</section>
+
 
       <section className="container mx-auto px-4 py-12 md:py-20">
         <RoomList initialRooms={rooms} />
