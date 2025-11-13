@@ -12,13 +12,13 @@ async function getRoom(id: string): Promise<Room | null> {
     const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {
-      console.error("[v0] Erreur Supabase:", error.message)
+      console.error("Erreur Supabase:", error.message)
       return null
     }
 
     return data
   } catch (error: any) {
-    console.error("[v0] Erreur de connexion:", error?.message || "Erreur inconnue")
+    console.error("Erreur de connexion:", error?.message || "Erreur inconnue")
     return null
   }
 }

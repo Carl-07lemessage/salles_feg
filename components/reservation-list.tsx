@@ -16,6 +16,9 @@ interface ReservationListProps {
 }
 
 export function ReservationList({ reservations }: ReservationListProps) {
+  console.log("ReservationList received", reservations.length, "reservations")
+  // </CHANGE>
+
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -24,6 +27,9 @@ export function ReservationList({ reservations }: ReservationListProps) {
     if (statusFilter === "all") return true
     return reservation.status === statusFilter
   })
+
+  console.log("After filtering by", statusFilter, ":", filteredReservations.length, "reservations")
+  // </CHANGE>
 
   const handleViewDetails = (reservation: Reservation) => {
     setSelectedReservation(reservation)

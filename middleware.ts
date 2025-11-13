@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
       const { data: adminUser, error } = await supabaseAdmin.from("admin_users").select("id").eq("id", user.id).single()
 
       if (error || !adminUser) {
-        console.log("[v0] User is not an admin, redirecting to auth page")
+        console.log(" User is not an admin, redirecting to auth page")
         const url = request.nextUrl.clone()
         url.pathname = "/admin/auth"
         return NextResponse.redirect(url)
@@ -90,7 +90,7 @@ export async function middleware(request: NextRequest) {
       }
     }
   } catch (error) {
-    console.log("[v0] Middleware error:", error)
+    console.log("Middleware error:", error)
     // Allow access when there's an error for development
   }
 

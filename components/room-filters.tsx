@@ -80,7 +80,7 @@ export function RoomFilters({ onFilterChange }: RoomFiltersProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price">Prix maximum (€/heure)</Label>
+            <Label htmlFor="price">Prix maximum (fcfa/heure)</Label>
             <Input
               id="price"
               type="number"

@@ -51,7 +51,7 @@ export function RoomManagementTable({ rooms }: RoomManagementTableProps) {
       toast.success("Salle supprimée avec succès")
       router.refresh()
     } catch (error) {
-      console.error("[v0] Delete error:", error)
+      console.error("Delete error:", error)
       toast.error("Erreur lors de la suppression")
     } finally {
       setIsDeleting(false)

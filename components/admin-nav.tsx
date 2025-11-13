@@ -24,7 +24,7 @@ export function AdminNav() {
       router.push("/admin/auth")
       router.refresh()
     } catch (error) {
-      console.log("[v0] Supabase not connected, simulating logout")
+      console.log("Supabase not connected, simulating logout")
       toast.success("Déconnexion réussie")
       router.push("/admin/auth")
     } finally {

@@ -16,13 +16,13 @@ async function getRoom(id: string): Promise<Room | null> {
     const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {
-      console.error("[v0] Erreur Supabase:", error.message)
+      console.error("] Erreur Supabase:", error.message)
       return null
     }
 
     return data
   } catch (error: any) {
-    console.error("[v0] Erreur de connexion:", error?.message || "Erreur inconnue")
+    console.error("Erreur de connexion:", error?.message || "Erreur inconnue")
     return null
   }
 }
@@ -34,6 +34,9 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
   if (!room) {
     notFound()
   }
+
+  // Ensure Image src is always a string and avoid passing `null` to getDirectImageUrl
+  const imageSrc = room.image_url ? (getDirectImageUrl(room.image_url) ?? "/feg.png") : "/feg.png"
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,8 +61,8 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
           {/* Left Column - Room Details */}
           <div className="space-y-10">
             <div className="relative h-[420px] md:h-[540px] w-full rounded-2xl overflow-hidden bg-muted shadow-xl">
-               <Image
-                src={room.image_url ? getDirectImageUrl(room.image_url) : "/placeholder.svg"}
+              <Image
+                src={imageSrc}
                 alt={room.name}
                 fill
                 className="object-cover"
@@ -78,7 +81,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                 <h2 className="text-2xl font-semibold mb-8 tracking-tight">Caractéristiques principales</h2>
                 <div className="grid sm:grid-cols-2 gap-8">
                   <div className="flex items-center gap-5">
-                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                       <Users className="h-7 w-7 text-primary" />
                     </div>
                     <div>
@@ -89,7 +92,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                     </div>
                   </div>
                   <div className="flex items-center gap-5">
-                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                       <span className="text-3xl font-bold text-primary">₣</span>
                     </div>
                     <div>
@@ -113,7 +116,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                   <div className="grid sm:grid-cols-2 gap-5">
                     {room.amenities.map((amenity) => (
                       <div key={amenity} className="flex items-center gap-4 group">
-                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                           <CheckCircle2 className="h-5 w-5 text-primary" />
                         </div>
                         <span className="font-medium text-base">{amenity}</span>

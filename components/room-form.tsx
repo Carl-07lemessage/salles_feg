@@ -49,10 +49,9 @@ export function RoomForm({ room }: RoomFormProps) {
       return
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024
+    const maxSize = 8 * 1024 * 1024
     if (file.size > maxSize) {
-      toast.error("Le fichier est trop volumineux. Taille maximale: 5MB")
+      toast.error("Le fichier est trop volumineux. Taille maximale: 8MB")
       return
     }
 
@@ -83,7 +82,7 @@ export function RoomForm({ room }: RoomFormProps) {
       setFormData({ ...formData, image_url: data.url })
       toast.success("Image téléchargée avec succès")
     } catch (error) {
-      console.error("[v0] Upload error:", error)
+      console.error("Upload error:", error)
       toast.error("Erreur lors du téléchargement de l'image")
       setImagePreview(formData.image_url)
     } finally {
@@ -140,7 +139,7 @@ export function RoomForm({ room }: RoomFormProps) {
       router.push("/admin")
       router.refresh()
     } catch (error) {
-      console.error("[v0] Form error:", error)
+      console.error("Form error:", error)
       toast.error("Une erreur est survenue")
     } finally {
       setIsSubmitting(false)
@@ -211,7 +210,7 @@ export function RoomForm({ room }: RoomFormProps) {
             {imagePreview && (
               <div className="relative w-full h-48 rounded-lg overflow-hidden border bg-muted">
                 <Image
-                  src={imagePreview || "/placeholder.svg"}
+                  src={imagePreview || "/feg.png"}
                   alt="Aperçu"
                   fill
                   className="object-cover"
