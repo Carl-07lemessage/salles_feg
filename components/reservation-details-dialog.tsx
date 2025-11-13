@@ -40,7 +40,7 @@ export function ReservationDetailsDialog({ reservation, open, onOpenChange }: Re
       onOpenChange(false)
       router.refresh()
     } catch (error) {
-      console.error("[v0] Update error:", error)
+      console.error("Update error:", error)
       toast.error("Erreur lors de la mise à jour")
     } finally {
       setIsUpdating(false)

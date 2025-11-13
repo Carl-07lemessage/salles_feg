@@ -33,13 +33,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         .single()
 
       if (error) {
-        console.error("[v0] Supabase error:", error)
+        console.error("Supabase error:", error)
         return NextResponse.json({ error: "Erreur lors de la mise à jour de la salle" }, { status: 500 })
       }
 
       return NextResponse.json(data)
     } catch (error) {
-      console.log("[v0] Supabase not connected, simulating success")
+      console.log("Supabase not connected, simulating success")
       return NextResponse.json(
         {
           id,
@@ -57,7 +57,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       )
     }
   } catch (error) {
-    console.error("[v0] Request error:", error)
+    console.error("Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
@@ -72,17 +72,17 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       const { error } = await supabase.from("rooms").delete().eq("id", id)
 
       if (error) {
-        console.error("[v0] Supabase error:", error)
+        console.error("Supabase error:", error)
         return NextResponse.json({ error: "Erreur lors de la suppression de la salle" }, { status: 500 })
       }
 
       return NextResponse.json({ success: true })
     } catch (error) {
-      console.log("[v0] Supabase not connected, simulating success")
+      console.log("Supabase not connected, simulating success")
       return NextResponse.json({ success: true }, { status: 200 })
     }
   } catch (error) {
-    console.error("[v0] Request error:", error)
+    console.error("Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }

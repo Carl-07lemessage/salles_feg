@@ -36,19 +36,19 @@ export default function AdminAuthPage() {
     setIsLoading(true)
 
     try {
-      console.log("[v0] Creating Supabase client for login")
+      console.log(" Creating Supabase client for login")
       const supabase = createClient()
-      console.log("[v0] Supabase client created, attempting sign in")
+      console.log("Supabase client created, attempting sign in")
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       })
 
-      console.log("[v0] Sign in response:", { hasData: !!data, hasError: !!error, errorMessage: error?.message })
+      console.log("Sign in response:", { hasData: !!data, hasError: !!error, errorMessage: error?.message })
 
       if (error) {
-        console.error("[v0] Sign in error:", error)
+        console.error(" Sign in error:", error)
         toast.error("Email ou mot de passe incorrect")
         return
       }
@@ -68,7 +68,7 @@ export default function AdminAuthPage() {
         router.refresh()
       }
     } catch (error) {
-      console.log("[v0] Supabase not connected, simulating login")
+      console.log("Supabase not connected, simulating login")
       toast.success("Connexion réussie ! (Mode démo)")
       router.push("/admin")
     } finally {
@@ -141,7 +141,7 @@ export default function AdminAuthPage() {
             setActiveTab("login")
             setLoginData({ email: registerData.email, password: "" })
           } else {
-            console.error("[v0] Error adding admin user:", result.error)
+            console.error("Error adding admin user:", result.error)
             toast.error("Erreur lors de la création du compte administrateur")
           }
           return
@@ -161,7 +161,7 @@ export default function AdminAuthPage() {
         }
       }
     } catch (error) {
-      console.log("[v0] Supabase not connected, simulating registration")
+      console.log("Supabase not connected, simulating registration")
       toast.success("Inscription réussie ! (Mode démo)")
       setActiveTab("login")
     } finally {
@@ -249,7 +249,7 @@ export default function AdminAuthPage() {
                     <Input
                       id="register-name"
                       type="text"
-                      placeholder="Jean Dupont"
+                      placeholder="Jean Mikomba"
                       value={registerData.name}
                       onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                       className="pl-9 h-11"

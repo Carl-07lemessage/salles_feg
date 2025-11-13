@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Type de fichier non valide. Utilisez JPG, PNG, WebP ou GIF" }, { status: 400 })
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024 // 5MB
+    // Validate file size (max 8MB)
+    const maxSize = 8 * 1024 * 1024 // 8MB
     if (file.size > maxSize) {
-      return NextResponse.json({ error: "Le fichier est trop volumineux. Taille maximale: 5MB" }, { status: 400 })
+      return NextResponse.json({ error: "Le fichier est trop volumineux. Taille maximale: 8MB" }, { status: 400 })
     }
 
     // Upload to Vercel Blob
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       type: file.type,
     })
   } catch (error) {
-    console.error("[v0] Upload error:", error)
+    console.error("Upload error:", error)
     return NextResponse.json(
       {
         error: `Erreur lors du téléchargement: ${error instanceof Error ? error.message : "Erreur inconnue"}`,

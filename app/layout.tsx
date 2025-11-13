@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FEG - Location de Salles",
   description: "Fédération des Entreprises du Gabon - Réservez des salles professionnelles pour vos événements",
-    generator: 'v0.app'
+    generator: 'Monsieur MIKOLO'
 }
 
 export default function RootLayout({

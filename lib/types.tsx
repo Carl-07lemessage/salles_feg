@@ -17,10 +17,11 @@ export interface Reservation {
   room_id: string
   customer_name: string
   customer_email: string
-  customer_phone: string | null
-  event_object?: string
+  customer_phone: string
+  event_object: string
   start_hour?: number
   end_hour?: number
+  // </CHANGE>
   start_time: string
   end_time: string
   status: "pending" | "confirmed" | "cancelled"

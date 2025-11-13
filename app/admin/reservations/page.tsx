@@ -4,6 +4,7 @@ import { ReservationDashboard } from "@/components/reservation-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { YearlyReservationView } from "@/components/yearly-reservation-view"
 
 async function getReservations(): Promise<Reservation[]> {
   try {
@@ -19,19 +20,26 @@ async function getReservations(): Promise<Reservation[]> {
       .order("start_time", { ascending: true })
 
     if (error) {
-      console.error("[v0] Erreur Supabase:", error.message)
+      console.error("Erreur Supabase:", error.message)
       return []
     }
 
+    console.log("Total reservations loaded:", data?.length || 0)
+    console.log("Sample reservation:", data?.[0])
+    // </CHANGE>
+
     return data || []
   } catch (error: any) {
-    console.error("[v0] Erreur de connexion:", error?.message || "Erreur inconnue")
+    console.error("Erreur de connexion:", error?.message || "Erreur inconnue")
     return []
   }
 }
 
 export default async function ReservationsPage() {
   const reservations = await getReservations()
+
+  console.log(" Passing", reservations.length, "reservations to components")
+  // </CHANGE>
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -46,11 +54,16 @@ export default async function ReservationsPage() {
         </Link>
       </div>
 
-      <Tabs defaultValue="calendar" className="space-y-6">
+      <Tabs defaultValue="yearly" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="yearly">Vue Annuelle</TabsTrigger>
           <TabsTrigger value="calendar">Vue Calendrier</TabsTrigger>
           <TabsTrigger value="list">Vue Liste</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="yearly" className="space-y-4">
+          <YearlyReservationView reservations={reservations} />
+        </TabsContent>
 
         <TabsContent value="calendar" className="space-y-4">
           <ReservationDashboard reservations={reservations} view="calendar" />

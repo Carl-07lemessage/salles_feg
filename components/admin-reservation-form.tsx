@@ -30,14 +30,16 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [occupiedDates, setOccupiedDates] = useState<Date[]>([])
+  const [startHour, setStartHour] = useState<string>("8")
+  const [endHour, setEndHour] = useState<string>("18")
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    eventObject: "",
     notes: "",
   })
 
-  // Fetch available rooms
   useEffect(() => {
     const fetchRooms = async () => {
       try {
@@ -47,7 +49,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
           setRooms(data)
         }
       } catch (error) {
-        console.error("[v0] Error fetching rooms:", error)
+        console.error("Error fetching rooms:", error)
       }
     }
     if (open) {
@@ -55,7 +57,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
     }
   }, [open])
 
-  // Fetch occupied dates when room is selected
   useEffect(() => {
     if (!selectedRoom) return
 
@@ -78,7 +79,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
           setOccupiedDates(dates)
         }
       } catch (error) {
-        console.error("[v0] Error fetching occupied dates:", error)
+        console.error("Error fetching occupied dates:", error)
       }
     }
     fetchOccupiedDates()
@@ -111,14 +112,24 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
       return
     }
 
+    if (!formData.eventObject.trim()) {
+      toast.error("Veuillez spécifier l'objet de l'événement")
+      return
+    }
+
+    if (!formData.customerPhone.trim()) {
+      toast.error("Veuillez fournir un numéro de téléphone")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       const startDateTime = new Date(dateRange.from)
-      startDateTime.setHours(0, 0, 0, 0)
+      startDateTime.setHours(Number.parseInt(startHour), 0, 0, 0)
 
       const endDateTime = new Date(dateRange.to)
-      endDateTime.setHours(23, 59, 59, 999)
+      endDateTime.setHours(Number.parseInt(endHour), 59, 59, 999)
 
       const response = await fetch("/api/reservations", {
         method: "POST",
@@ -130,8 +141,11 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
           customer_name: formData.customerName,
           customer_email: formData.customerEmail,
           customer_phone: formData.customerPhone,
+          event_object: formData.eventObject,
           start_time: startDateTime.toISOString(),
           end_time: endDateTime.toISOString(),
+          start_hour: Number.parseInt(startHour),
+          end_hour: Number.parseInt(endHour),
           total_price: totalPrice,
           notes: formData.notes,
         }),
@@ -147,17 +161,19 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
       onOpenChange(false)
       onSuccess()
 
-      // Reset form
       setSelectedRoom(null)
       setDateRange(undefined)
+      setStartHour("8")
+      setEndHour("18")
       setFormData({
         customerName: "",
         customerEmail: "",
         customerPhone: "",
+        eventObject: "",
         notes: "",
       })
     } catch (error: any) {
-      console.error("[v0] Booking error:", error)
+      console.error("Booking error:", error)
       toast.error(error.message || "Une erreur est survenue. Veuillez réessayer.")
     } finally {
       setIsSubmitting(false)
@@ -173,7 +189,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Room Selection */}
           <div className="space-y-2">
             <Label htmlFor="room">Salle *</Label>
             <Select
@@ -181,7 +196,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
               onValueChange={(value) => {
                 const room = rooms.find((r) => r.id === value)
                 setSelectedRoom(room || null)
-                setDateRange(undefined) // Reset dates when room changes
+                setDateRange(undefined)
               }}
             >
               <SelectTrigger>
@@ -197,7 +212,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             </Select>
           </div>
 
-          {/* Customer Name */}
           <div className="space-y-2">
             <Label htmlFor="name">Nom du client *</Label>
             <Input
@@ -209,7 +223,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             />
           </div>
 
-          {/* Customer Email */}
           <div className="space-y-2">
             <Label htmlFor="email">Email du client *</Label>
             <Input
@@ -222,19 +235,18 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             />
           </div>
 
-          {/* Customer Phone */}
           <div className="space-y-2">
-            <Label htmlFor="phone">Téléphone du client</Label>
+            <Label htmlFor="phone">Téléphone du client *</Label>
             <Input
               id="phone"
               type="tel"
               placeholder="+241 XX XX XX XX"
               value={formData.customerPhone}
               onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+              required
             />
           </div>
 
-          {/* Date Range */}
           {selectedRoom && (
             <div className="space-y-2">
               <Label>Période de réservation *</Label>
@@ -265,9 +277,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
                     selected={dateRange}
                     onSelect={setDateRange}
                     disabled={(date) => {
-                      // Disable past dates
                       if (date < new Date()) return true
-                      // Disable occupied dates
                       return occupiedDates.some((occupiedDate) => occupiedDate.toDateString() === date.toDateString())
                     }}
                     numberOfMonths={2}
@@ -281,7 +291,51 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             </div>
           )}
 
-          {/* Notes */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startHour">Heure de début *</Label>
+              <Select value={startHour} onValueChange={setStartHour} required>
+                <SelectTrigger id="startHour">
+                  <SelectValue placeholder="Heure de début" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <SelectItem key={i} value={i.toString()}>
+                      {i.toString().padStart(2, "0")}:00
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="endHour">Heure de fin *</Label>
+              <Select value={endHour} onValueChange={setEndHour} required>
+                <SelectTrigger id="endHour">
+                  <SelectValue placeholder="Heure de fin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <SelectItem key={i} value={i.toString()} disabled={i <= Number.parseInt(startHour)}>
+                      {i.toString().padStart(2, "0")}:00
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="eventObject">Objet de l'événement *</Label>
+            <Input
+              id="eventObject"
+              placeholder="Ex: Réunion d'équipe, Formation, Conférence..."
+              value={formData.eventObject}
+              onChange={(e) => setFormData({ ...formData, eventObject: e.target.value })}
+              required
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (optionnel)</Label>
             <Textarea
@@ -293,7 +347,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             />
           </div>
 
-          {/* Price Summary */}
           {totalPrice > 0 && selectedRoom && (
             <div className="rounded-lg bg-muted p-4 space-y-2">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -311,7 +364,6 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             </div>
           )}
 
-          {/* Submit Button */}
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Annuler
