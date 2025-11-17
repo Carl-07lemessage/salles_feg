@@ -30,3 +30,13 @@ export interface Reservation {
   updated_at: string
   room?: Room
 }
+
+// Catering prices in FCFA
+export const CATERING_PRICES = {
+  LUNCH: 25000,
+  BREAKFAST_OPTION_1: 6000,
+  BREAKFAST_OPTION_2: 9000,
+  BREAKFAST_OPTION_3: 12000,
+  COFFEE_BREAK: 3500,
+} as const
+

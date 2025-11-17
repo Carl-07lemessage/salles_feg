@@ -298,7 +298,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
                 <SelectTrigger id="startHour">
                   <SelectValue placeholder="Heure de début" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent >
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       {i.toString().padStart(2, "0")}:00
@@ -310,7 +310,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
 
             <div className="space-y-2">
               <Label htmlFor="endHour">Heure de fin *</Label>
-              <Select value={endHour} onValueChange={setEndHour} required>
+              <Select  value={endHour} onValueChange={setEndHour} required>
                 <SelectTrigger id="endHour">
                   <SelectValue placeholder="Heure de fin" />
                 </SelectTrigger>
