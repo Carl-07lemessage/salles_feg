@@ -48,11 +48,6 @@ export default async function ReservationsPage() {
         <p className="text-muted-foreground mt-2">Visualisez et gérez toutes les réservations</p>
       </div>
 
-      <div className="mb-4">
-        <Link href="/admin/reservations/create">
-          <Button variant="default">Créer une Réservation</Button>
-        </Link>
-      </div>
 
       <Tabs defaultValue="yearly" className="space-y-6">
         <TabsList>

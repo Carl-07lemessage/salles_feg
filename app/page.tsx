@@ -46,7 +46,7 @@ export default async function HomePage() {
   />
 
   {/* Contenu principal */}
-  <div className="relative container mx-auto px-4 py-16 md:py-24">
+  <div className="relative container mx-auto px-4 py-9 md:py-24">
     <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
       <div className="inline-flex items-center gap-2 rounded-[10px] border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
         <Building2 className="h-4 w-4" />

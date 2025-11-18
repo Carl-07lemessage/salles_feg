@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import type { Reservation } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,7 @@ import {
   startOfYear,
   endOfYear,
   eachMonthOfInterval,
+  isSameDay,
 } from "date-fns"
 import { fr } from "date-fns/locale"
 
@@ -36,6 +37,31 @@ export function YearlyReservationView({ reservations }: YearlyReservationViewPro
   const router = useRouter()
   const [updatingReservationId, setUpdatingReservationId] = useState<string | null>(null)
 
+  // Optimisation : création d'une Map des réservations par date
+  const reservationsByDate = useMemo(() => {
+    const map = new Map<string, Reservation[]>()
+    
+    reservations.forEach((reservation) => {
+      if (reservation.status === "cancelled") return
+      
+      const startDate = new Date(reservation.start_time)
+      const endDate = new Date(reservation.end_time)
+      
+      // Pour les réservations multi-jours, on les ajoute pour chaque jour
+      let currentDate = new Date(startDate)
+      while (currentDate <= endDate) {
+        const dateKey = format(currentDate, "yyyy-MM-dd")
+        if (!map.has(dateKey)) {
+          map.set(dateKey, [])
+        }
+        map.get(dateKey)?.push(reservation)
+        currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1))
+      }
+    })
+    
+    return map
+  }, [reservations])
+
   const yearStart = startOfYear(new Date(currentYear, 0, 1))
   const yearEnd = endOfYear(new Date(currentYear, 11, 31))
   const months = eachMonthOfInterval({ start: yearStart, end: yearEnd })
@@ -49,11 +75,8 @@ export function YearlyReservationView({ reservations }: YearlyReservationViewPro
   }
 
   const getReservationsForDay = (day: Date) => {
-    return reservations.filter((reservation) => {
-      const startDate = new Date(reservation.start_time)
-      const endDate = new Date(reservation.end_time)
-      return day >= startDate && day <= endDate && reservation.status !== "cancelled"
-    })
+    const dateKey = format(day, "yyyy-MM-dd")
+    return reservationsByDate.get(dateKey) || []
   }
 
   const getStatusColor = (status: string) => {

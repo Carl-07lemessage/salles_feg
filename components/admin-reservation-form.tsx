@@ -202,7 +202,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner une salle" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-100">
                 {rooms.map((room) => (
                   <SelectItem key={room.id} value={room.id}>
                     {room.name} - {room.price_per_day.toLocaleString("fr-FR")} FCFA/jour
@@ -228,7 +228,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             <Input
               id="email"
               type="email"
-              placeholder="jean.dupont@example.com"
+              placeholder="jean@example.com"
               value={formData.customerEmail}
               onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
               required
@@ -298,7 +298,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
                 <SelectTrigger id="startHour">
                   <SelectValue placeholder="Heure de début" />
                 </SelectTrigger>
-                <SelectContent >
+                <SelectContent className="bg-gray-100">
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       {i.toString().padStart(2, "0")}:00
@@ -314,7 +314,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
                 <SelectTrigger id="endHour">
                   <SelectValue placeholder="Heure de fin" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-100">
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()} disabled={i <= Number.parseInt(startHour)}>
                       {i.toString().padStart(2, "0")}:00
