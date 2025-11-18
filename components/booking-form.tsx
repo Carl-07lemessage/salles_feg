@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import type { Room } from "@/lib/types"
+import { CATERING_OPTIONS } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,11 +13,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { CalendarIcon, Check } from 'lucide-react'
 import { format, differenceInDays, addDays } from "date-fns"
 import { fr } from "date-fns/locale"
 import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { toast } from "sonner"
 import type { DateRange } from "react-day-picker"
 
@@ -37,7 +39,15 @@ export function BookingForm({ room }: BookingFormProps) {
     customerPhone: "",
     eventObject: "",
     notes: "",
+    numberOfGuests: 1,
   })
+
+  const [cateringOptions, setCateringOptions] = useState({
+    lunchSelected: false,
+    breakfastOption: null as number | null,
+    coffeeBreakSelected: false,
+  })
+  // </CHANGE>
 
   useEffect(() => {
     const fetchOccupiedDates = async () => {
@@ -65,14 +75,41 @@ export function BookingForm({ room }: BookingFormProps) {
     fetchOccupiedDates()
   }, [room.id])
 
+  const calculateCateringCost = () => {
+    let cost = 0
+    const guests = formData.numberOfGuests
+
+    if (cateringOptions.lunchSelected) {
+      cost += CATERING_OPTIONS.lunch.price * guests
+    }
+
+    if (cateringOptions.breakfastOption) {
+      const breakfast = CATERING_OPTIONS.breakfast.find((b) => b.id === cateringOptions.breakfastOption)
+      if (breakfast) {
+        cost += breakfast.price * guests
+      }
+    }
+
+    if (cateringOptions.coffeeBreakSelected) {
+      cost += CATERING_OPTIONS.coffeeBreak.price * guests
+    }
+
+    return cost
+  }
+  // </CHANGE>
+
   const calculateTotalPrice = () => {
     if (!dateRange?.from || !dateRange?.to) return 0
-    const days = differenceInDays(dateRange.to, dateRange.from) + 1 // +1 to include both start and end days
-    return days * room.price_per_day
+    const days = differenceInDays(dateRange.to, dateRange.from) + 1
+    const roomCost = days * room.price_per_day
+    const cateringCost = calculateCateringCost()
+    return roomCost + cateringCost
   }
 
   const totalPrice = calculateTotalPrice()
   const numberOfDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0
+  const cateringCost = calculateCateringCost()
+  const roomCost = numberOfDays * room.price_per_day
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -123,6 +160,11 @@ export function BookingForm({ room }: BookingFormProps) {
           end_hour: Number.parseInt(endHour),
           total_price: totalPrice,
           notes: formData.notes,
+          lunch_selected: cateringOptions.lunchSelected,
+          breakfast_option: cateringOptions.breakfastOption,
+          coffee_break_selected: cateringOptions.coffeeBreakSelected,
+          number_of_guests: formData.numberOfGuests,
+          // </CHANGE>
         }),
       })
 
@@ -149,7 +191,7 @@ export function BookingForm({ room }: BookingFormProps) {
         <CardDescription>Remplissez le formulaire pour faire une demande de réservation</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Customer Name */}
           <div className="space-y-2">
             <Label htmlFor="name">Nom complet *</Label>
@@ -200,13 +242,28 @@ export function BookingForm({ room }: BookingFormProps) {
             />
           </div>
 
+          {/* Number of Guests */}
+          <div className="space-y-2">
+            <Label htmlFor="guests">Nombre de participants *</Label>
+            <Input
+              id="guests"
+              type="number"
+              min="1"
+              max={room.capacity}
+              value={formData.numberOfGuests}
+              onChange={(e) => setFormData({ ...formData, numberOfGuests: Number.parseInt(e.target.value) || 1 })}
+              required
+            />
+            <p className="text-xs text-muted-foreground">Capacité maximale : {room.capacity} personnes</p>
+          </div>
+
           <div className="space-y-2">
             <Label>Période de réservation *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground")}
+                  className={cn("w-full bg-gray-50 justify-start text-left font-normal", !dateRange && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateRange?.from ? (
@@ -249,7 +306,7 @@ export function BookingForm({ room }: BookingFormProps) {
                 <SelectTrigger id="startHour">
                   <SelectValue placeholder="Heure de début" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-100">
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       {i.toString().padStart(2, "0")}:00
@@ -265,7 +322,7 @@ export function BookingForm({ room }: BookingFormProps) {
                 <SelectTrigger id="endHour">
                   <SelectValue placeholder="Heure de fin" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-100">
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()} disabled={i <= Number.parseInt(startHour)}>
                       {i.toString().padStart(2, "0")}:00
@@ -275,6 +332,105 @@ export function BookingForm({ room }: BookingFormProps) {
               </Select>
             </div>
           </div>
+
+          <div className="space-y-4 rounded-lg border p-4 bg-muted/50">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-lg">Options de Restauration</h3>
+              <span className="text-sm text-muted-foreground">Optionnel</span>
+            </div>
+
+            {/* Lunch Option */}
+            <div className="flex items-start justify-between space-x-4 rounded-lg border bg-card p-4">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="lunch" className="text-base font-semibold">
+                    {CATERING_OPTIONS.lunch.name}
+                  </Label>
+                  <Switch
+                    id="lunch"
+                    checked={cateringOptions.lunchSelected}
+                    onCheckedChange={(checked) =>
+                      setCateringOptions({ ...cateringOptions, lunchSelected: checked })
+                    }
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{CATERING_OPTIONS.lunch.description}</p>
+                <p className="text-sm font-semibold text-primary">
+                  {CATERING_OPTIONS.lunch.price.toLocaleString("fr-FR")} FCFA/pers
+                </p>
+              </div>
+            </div>
+
+            {/* Breakfast Options */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Petit-déjeuner</Label>
+              {CATERING_OPTIONS.breakfast.map((breakfast) => (
+                <div
+                  key={breakfast.id}
+                  className={cn(
+                    "rounded-lg border bg-card p-4 cursor-pointer transition-all",
+                    cateringOptions.breakfastOption === breakfast.id && "ring-2 ring-primary",
+                  )}
+                  onClick={() =>
+                    setCateringOptions({
+                      ...cateringOptions,
+                      breakfastOption: cateringOptions.breakfastOption === breakfast.id ? null : breakfast.id,
+                    })
+                  }
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={cn(
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center",
+                          cateringOptions.breakfastOption === breakfast.id
+                            ? "border-primary bg-primary"
+                            : "border-muted-foreground",
+                        )}
+                      >
+                        {cateringOptions.breakfastOption === breakfast.id && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className="font-semibold">{breakfast.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-primary">
+                      {breakfast.price.toLocaleString("fr-FR")} FCFA/pers
+                    </span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-7">
+                    {breakfast.items.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* Coffee Break Option */}
+            <div className="flex items-start justify-between space-x-4 rounded-lg border bg-card p-4">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="coffeeBreak" className="text-base font-semibold">
+                    {CATERING_OPTIONS.coffeeBreak.name}
+                  </Label>
+                  <Switch
+                    id="coffeeBreak"
+                    checked={cateringOptions.coffeeBreakSelected}
+                    onCheckedChange={(checked) =>
+                      setCateringOptions({ ...cateringOptions, coffeeBreakSelected: checked })
+                    }
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{CATERING_OPTIONS.coffeeBreak.description}</p>
+                <p className="text-sm font-semibold text-primary">
+                  {CATERING_OPTIONS.coffeeBreak.price.toLocaleString("fr-FR")} FCFA/pers
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* </CHANGE> */}
 
           {/* Notes */}
           <div className="space-y-2">
@@ -291,10 +447,49 @@ export function BookingForm({ room }: BookingFormProps) {
           {totalPrice > 0 && (
             <div className="rounded-lg bg-muted p-4 space-y-2">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>
-                  {numberOfDays} jour{numberOfDays > 1 ? "s" : ""} × {room.price_per_day.toLocaleString("fr-FR")} FCFA
-                </span>
+                <span>Location de salle ({numberOfDays} jour{numberOfDays > 1 ? "s" : ""})</span>
+                <span>{roomCost.toLocaleString("fr-FR")} FCFA</span>
               </div>
+              {cateringCost > 0 && (
+                <>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Restauration ({formData.numberOfGuests} pers.)</span>
+                    <span>{cateringCost.toLocaleString("fr-FR")} FCFA</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground pl-4 space-y-1">
+                    {cateringOptions.lunchSelected && (
+                      <div className="flex justify-between">
+                        <span>• Déjeuner</span>
+                        <span>
+                          {(CATERING_OPTIONS.lunch.price * formData.numberOfGuests).toLocaleString("fr-FR")} FCFA
+                        </span>
+                      </div>
+                    )}
+                    {cateringOptions.breakfastOption && (
+                      <div className="flex justify-between">
+                        <span>
+                          • Petit-déjeuner Option {cateringOptions.breakfastOption}
+                        </span>
+                        <span>
+                          {(
+                            CATERING_OPTIONS.breakfast.find((b) => b.id === cateringOptions.breakfastOption)!.price *
+                            formData.numberOfGuests
+                          ).toLocaleString("fr-FR")}{" "}
+                          FCFA
+                        </span>
+                      </div>
+                    )}
+                    {cateringOptions.coffeeBreakSelected && (
+                      <div className="flex justify-between">
+                        <span>• Pause-café</span>
+                        <span>
+                          {(CATERING_OPTIONS.coffeeBreak.price * formData.numberOfGuests).toLocaleString("fr-FR")} FCFA
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
               <div className="flex items-center justify-between pt-2 border-t">
                 <span className="font-medium">Prix total estimé</span>
                 <div className="text-2xl font-bold">
@@ -303,6 +498,7 @@ export function BookingForm({ room }: BookingFormProps) {
               </div>
             </div>
           )}
+          {/* </CHANGE> */}
 
           {/* Submit Button */}
           <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>

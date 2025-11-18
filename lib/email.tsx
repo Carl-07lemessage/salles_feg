@@ -44,6 +44,100 @@ interface ReservationEmailData {
   reservationId: string
   customerPhone?: string
   notes?: string
+  eventObject?: string
+  startHour?: number
+  endHour?: number
+  lunchSelected?: boolean
+  breakfastOption?: number | null
+  coffeeBreakSelected?: boolean
+  numberOfGuests?: number
+}
+
+function formatCateringOptions(data: ReservationEmailData): string {
+  if (!data.lunchSelected && !data.breakfastOption && !data.coffeeBreakSelected) {
+    return ""
+  }
+
+  const guests = data.numberOfGuests || 1
+  let html = `
+    <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;margin-top:16px;">
+      <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Options de Restauration (${guests} personne${guests > 1 ? "s" : ""})</div>
+      <div style="space-y:8px;">
+  `
+
+  if (data.lunchSelected) {
+    html += `
+      <div style="padding:8px 0;border-bottom:1px solid #e2e8f0;">
+        <div style="font-weight:600;color:#063d21;margin-bottom:4px;">✓ Déjeuner Complet</div>
+        <div style="font-size:12px;color:#718096;">Entrée, plat de résistance et dessert</div>
+        <div style="font-size:13px;color:#0a5a31;font-weight:600;margin-top:4px;">${(25000 * guests).toLocaleString("fr-FR")} FCFA</div>
+      </div>
+    `
+  }
+
+  if (data.breakfastOption) {
+    const breakfastOptions = [
+      {
+        id: 1,
+        price: 6000,
+        name: "Petit-déjeuner Option 1",
+        items: ["Boisson chaude", "Boisson froide (jus d'orange, jus de pommes)", "Viennoiserie"],
+      },
+      {
+        id: 2,
+        price: 9000,
+        name: "Petit-déjeuner Option 2",
+        items: [
+          "Boisson chaude",
+          "Boisson froide (jus d'orange, pommes, cocktail, ananas)",
+          "Viennoiserie, eau, corbeille de pains",
+          "Beurre, confiture, fromage",
+          "Fruits (pommes et oranges)",
+        ],
+      },
+      {
+        id: 3,
+        price: 12000,
+        name: "Petit-déjeuner Option 3",
+        items: [
+          "Boisson chaude",
+          "Boisson froide (orange, pommes, cocktail, ananas, mangue, raisin)",
+          "Viennoiserie, corbeille de pains",
+          "Beurre, confiture, fromage, charcuterie",
+          "Fruits (pommes, oranges, bananes, pastèque, poires)",
+        ],
+      },
+    ]
+    const breakfast = breakfastOptions.find((b) => b.id === data.breakfastOption)
+    if (breakfast) {
+      html += `
+        <div style="padding:8px 0;border-bottom:1px solid #e2e8f0;">
+          <div style="font-weight:600;color:#063d21;margin-bottom:4px;">✓ ${breakfast.name}</div>
+          <ul style="font-size:12px;color:#718096;margin:4px 0;padding-left:20px;">
+            ${breakfast.items.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+          <div style="font-size:13px;color:#0a5a31;font-weight:600;margin-top:4px;">${(breakfast.price * guests).toLocaleString("fr-FR")} FCFA</div>
+        </div>
+      `
+    }
+  }
+
+  if (data.coffeeBreakSelected) {
+    html += `
+      <div style="padding:8px 0;">
+        <div style="font-weight:600;color:#063d21;margin-bottom:4px;">✓ Pause-café</div>
+        <div style="font-size:12px;color:#718096;">Rafraîchissements et collations</div>
+        <div style="font-size:13px;color:#0a5a31;font-weight:600;margin-top:4px;">${(3500 * guests).toLocaleString("fr-FR")} FCFA</div>
+      </div>
+    `
+  }
+
+  html += `
+      </div>
+    </div>
+  `
+
+  return html
 }
 
 // Template email de confirmation pour le client - Version institutionnelle
@@ -91,8 +185,8 @@ export async function sendCustomerConfirmationEmail(data: ReservationEmailData) 
             <div style="background:linear-gradient(135deg, #f7faf7 0%, #f0f4f0 100%);border:1px solid #d1e7dd;border-radius:10px;padding:28px 24px 24px 24px;margin-bottom:32px;text-align:center;position:relative;">
               <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);">
                 <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg, #063d21 0%, #0a5a31 100%);color:#ffffff;padding:8px 20px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 4px 12px rgba(6, 61, 33, 0.25);border:1px solid rgba(255,255,255,0.1);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"></path>
                   </svg>
                   RÉSERVATION CONFIRMÉE
                 </div>
@@ -125,14 +219,23 @@ export async function sendCustomerConfirmationEmail(data: ReservationEmailData) 
                     </div>
                   </div>
 
+                  ${data.eventObject ? `
+                  <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
+                    <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Objet de l'événement</div>
+                    <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${data.eventObject}</div>
+                  </div>
+                  ` : ''}
+
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
                       <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Date de Début</div>
                       <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${new Date(startDate).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+                      ${data.startHour !== undefined ? `<div style="font-size:12px;color:#718096;margin-top:4px;">${data.startHour.toString().padStart(2, '0')}:00</div>` : ''}
                     </div>
                     <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
                       <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Date de Fin</div>
                       <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${new Date(endDate).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+                      ${data.endHour !== undefined ? `<div style="font-size:12px;color:#718096;margin-top:4px;">${data.endHour.toString().padStart(2, '0')}:00</div>` : ''}
                     </div>
                   </div>
 
@@ -142,6 +245,8 @@ export async function sendCustomerConfirmationEmail(data: ReservationEmailData) 
                     <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${customerPhone}</div>
                   </div>
                   ` : ''}
+
+                  ${formatCateringOptions(data)}
 
                   <div style="text-align:center;background:linear-gradient(135deg, #f7faf7 0%, #f0f4f0 100%);border-radius:8px;padding:20px;border:2px solid #d1e7dd;">
                     <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Montant Total</div>
@@ -255,8 +360,8 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
             <div style="background:linear-gradient(135deg, #fff3cd 0%, #fce8b2 100%);border:1px solid #f5c6cb;border-radius:10px;padding:28px 24px 24px 24px;margin-bottom:32px;text-align:center;position:relative;">
               <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);">
                 <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg, #856404 0%, #b38b00 100%);color:#ffffff;padding:8px 20px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 4px 12px rgba(133, 100, 4, 0.25);border:1px solid rgba(255,255,255,0.1);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
-                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" strokeLinecap="round" strokeLinejoin="round"></path>
                   </svg>
                   NOUVELLE RÉSERVATION
                 </div>
@@ -284,6 +389,13 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
                     <div style="font-size:16px;color:#063d21;font-weight:600;margin-top:4px;">${roomName}</div>
                   </div>
 
+                  ${data.eventObject ? `
+                  <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
+                    <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Objet de l'événement</div>
+                    <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${data.eventObject}</div>
+                  </div>
+                  ` : ''}
+
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
                       <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Client</div>
@@ -306,10 +418,12 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
                     <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
                       <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Date de Début</div>
                       <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${new Date(startDate).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+                      ${data.startHour !== undefined ? `<div style="font-size:12px;color:#718096;margin-top:4px;">${data.startHour.toString().padStart(2, '0')}:00</div>` : ''}
                     </div>
                     <div style="text-align:left;background:#ffffff;border-radius:8px;padding:16px;border:1px solid #e2e8f0;">
                       <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Date de Fin</div>
                       <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${new Date(endDate).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+                      ${data.endHour !== undefined ? `<div style="font-size:12px;color:#718096;margin-top:4px;">${data.endHour.toString().padStart(2, '0')}:00</div>` : ''}
                     </div>
                   </div>
 
@@ -319,6 +433,8 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
                     <div style="font-size:14px;color:#063d21;font-weight:600;margin-top:4px;">${notes}</div>
                   </div>
                   ` : ''}
+
+                  ${formatCateringOptions(data)}
 
                   <div style="text-align:center;background:linear-gradient(135deg, #f7faf7 0%, #f0f4f0 100%);border-radius:8px;padding:20px;border:2px solid #d1e7dd;">
                     <div style="font-size:12px;color:#718096;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Montant Total</div>
@@ -423,8 +539,8 @@ export async function sendCancellationEmail(data: ReservationEmailData) {
             <div style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);border:1px solid #fecaca;border-radius:10px;padding:28px 24px 24px 24px;margin-bottom:32px;text-align:center;position:relative;">
               <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);">
                 <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);color:#ffffff;padding:8px 20px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 4px 12px rgba(220, 38, 38, 0.25);border:1px solid rgba(255,255,255,0.1);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
-                    <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">
+                    <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round"></path>
                   </svg>
                   RÉSERVATION ANNULÉE
                 </div>

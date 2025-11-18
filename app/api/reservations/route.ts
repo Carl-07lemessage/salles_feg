@@ -58,6 +58,10 @@ export async function POST(request: Request) {
       end_hour,
       total_price,
       notes,
+      lunch_selected,
+      breakfast_option,
+      coffee_break_selected,
+      number_of_guests,
     } = body
 
     if (
@@ -98,6 +102,10 @@ export async function POST(request: Request) {
           end_hour: end_hour || 18,
           total_price,
           notes,
+          lunch_selected,
+          breakfast_option,
+          coffee_break_selected,
+          number_of_guests,
           status: "pending",
           created_at: new Date().toISOString(),
         },
@@ -123,24 +131,28 @@ export async function POST(request: Request) {
         )
       }
 
-      const { data, error } = await supabase
-        .from("reservations")
-        .insert({
-          room_id,
-          customer_name,
-          customer_email,
-          customer_phone,
-          event_object,
-          start_time,
-          end_time,
-          start_hour: start_hour || 8,
-          end_hour: end_hour || 18,
-          total_price,
-          notes,
-          status: "pending",
-        })
-        .select()
-        .single()
+      const insertPayload: Record<string, any> = {
+        room_id,
+        customer_name,
+        customer_email,
+        customer_phone,
+        event_object,
+        start_time,
+        end_time,
+        start_hour: start_hour || 8,
+        end_hour: end_hour || 18,
+        total_price,
+        notes,
+        status: "pending",
+      }
+
+      // Only add optional catering fields if they are present in the request
+      if (typeof lunch_selected !== "undefined") insertPayload.lunch_selected = lunch_selected
+      if (typeof breakfast_option !== "undefined") insertPayload.breakfast_option = breakfast_option
+      if (typeof coffee_break_selected !== "undefined") insertPayload.coffee_break_selected = coffee_break_selected
+      if (typeof number_of_guests !== "undefined") insertPayload.number_of_guests = number_of_guests
+
+      const { data, error } = await supabase.from("reservations").insert(insertPayload).select().single()
 
       if (error) {
         console.error("Supabase error:", error)
@@ -163,6 +175,10 @@ export async function POST(request: Request) {
           totalPrice: total_price,
           reservationId: data.id,
           notes: notes,
+          lunchSelected: lunch_selected,
+          breakfastOption: breakfast_option,
+          coffeeBreakSelected: coffee_break_selected,
+          numberOfGuests: number_of_guests,
         }
 
         // Envoyer les emails en parallèle (ne pas bloquer la réponse)
@@ -190,6 +206,10 @@ export async function POST(request: Request) {
           end_hour,
           total_price,
           notes,
+          lunch_selected,
+          breakfast_option,
+          coffee_break_selected,
+          number_of_guests,
           status: "pending",
           created_at: new Date().toISOString(),
         },
