@@ -97,7 +97,7 @@ export function RoomFilters({ onFilterChange }: RoomFiltersProps) {
               <SelectTrigger id="sort">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-50">
+              <SelectContent>
                 <SelectItem value="name">Nom</SelectItem>
                 <SelectItem value="price-asc">Prix croissant</SelectItem>
                 <SelectItem value="price-desc">Prix décroissant</SelectItem>

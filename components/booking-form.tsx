@@ -263,7 +263,7 @@ export function BookingForm({ room }: BookingFormProps) {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("w-full bg-gray-50 justify-start text-left font-normal", !dateRange && "text-muted-foreground")}
+                  className={cn("w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateRange?.from ? (
@@ -306,7 +306,7 @@ export function BookingForm({ room }: BookingFormProps) {
                 <SelectTrigger id="startHour">
                   <SelectValue placeholder="Heure de début" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-100">
+                <SelectContent>
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       {i.toString().padStart(2, "0")}:00
@@ -322,7 +322,7 @@ export function BookingForm({ room }: BookingFormProps) {
                 <SelectTrigger id="endHour">
                   <SelectValue placeholder="Heure de fin" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-100">
+                <SelectContent>
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()} disabled={i <= Number.parseInt(startHour)}>
                       {i.toString().padStart(2, "0")}:00
