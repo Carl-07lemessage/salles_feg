@@ -202,7 +202,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner une salle" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-100">
+              <SelectContent>
                 {rooms.map((room) => (
                   <SelectItem key={room.id} value={room.id}>
                     {room.name} - {room.price_per_day.toLocaleString("fr-FR")} FCFA/jour
@@ -228,7 +228,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
             <Input
               id="email"
               type="email"
-              placeholder="jean@example.com"
+              placeholder="jean.dupont@example.com"
               value={formData.customerEmail}
               onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
               required
@@ -298,7 +298,7 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
                 <SelectTrigger id="startHour">
                   <SelectValue placeholder="Heure de début" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-100">
+                <SelectContent>
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       {i.toString().padStart(2, "0")}:00
@@ -310,11 +310,11 @@ export function AdminReservationForm({ open, onOpenChange, onSuccess }: AdminRes
 
             <div className="space-y-2">
               <Label htmlFor="endHour">Heure de fin *</Label>
-              <Select  value={endHour} onValueChange={setEndHour} required>
+              <Select value={endHour} onValueChange={setEndHour} required>
                 <SelectTrigger id="endHour">
                   <SelectValue placeholder="Heure de fin" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-100">
+                <SelectContent>
                   {Array.from({ length: 24 }, (_, i) => (
                     <SelectItem key={i} value={i.toString()} disabled={i <= Number.parseInt(startHour)}>
                       {i.toString().padStart(2, "0")}:00
