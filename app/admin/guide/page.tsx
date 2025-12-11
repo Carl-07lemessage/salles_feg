@@ -17,7 +17,6 @@ import {
 export default function AdminGuidePage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      <AdminNav />
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">Guide d'Utilisation - Administration</h1>
