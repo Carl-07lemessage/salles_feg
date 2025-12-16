@@ -8,30 +8,30 @@ Ajoutez les variables suivantes à votre projet Vercel ou dans votre fichier `.e
 
 ### 1. EMAIL_USER
 Votre adresse email Gmail (ou autre service SMTP)
-\`\`\`
+```
 EMAIL_USER=votre-email@gmail.com
-\`\`\`
+```
 
 ### 2. EMAIL_APP_PASSWORD
 Le mot de passe d'application Gmail fourni : **eywg xqbm pwdy cmsq**
 
 **Important :** N'utilisez PAS votre mot de passe Gmail normal. Utilisez un "mot de passe d'application" généré depuis votre compte Google.
 
-\`\`\`
+```
 EMAIL_APP_PASSWORD=eywg xqbm pwdy cmsq
-\`\`\`
+```
 
 ### 3. ADMIN_EMAIL (Optionnel)
 L'adresse email où les notifications admin seront envoyées. Si non défini, utilise EMAIL_USER.
-\`\`\`
+```
 ADMIN_EMAIL=admin@votre-domaine.com
-\`\`\`
+```
 
 ### 4. NEXT_PUBLIC_APP_URL (Optionnel)
 L'URL de votre application pour les liens dans les emails
-\`\`\`
+```
 NEXT_PUBLIC_APP_URL=https://votre-domaine.com
-\`\`\`
+```
 
 ## Comment Générer un Mot de Passe d'Application Gmail
 
@@ -100,7 +100,7 @@ Les templates d'emails se trouvent dans `lib/email.ts`. Vous pouvez personnalise
 
 Si vous souhaitez utiliser un autre service que Gmail, modifiez la configuration dans `lib/email.ts` :
 
-\`\`\`typescript
+```typescript
 const transporter = nodemailer.createTransport({
   host: 'smtp.votre-service.com',
   port: 587,
@@ -110,13 +110,13 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_APP_PASSWORD,
   },
 })
-\`\`\`
+```
 
 ## Support
 
 Pour toute question sur la configuration des emails, consultez :
 - Documentation Nodemailer : https://nodemailer.com/
 - Documentation Gmail App Passwords : https://support.google.com/accounts/answer/185833
-\`\`\`
+```
 
 ```json file="" isHidden

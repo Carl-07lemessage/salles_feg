@@ -2,33 +2,35 @@ import { getSupabaseServerClient } from "@/lib/supabase-server"
 import { isDatabaseInitialized } from "@/lib/db-helper"
 import { NextResponse } from "next/server"
 
-export async function GET() {
+// GET a single room by ID
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    const { id } = await params
     const dbReady = await isDatabaseInitialized()
 
     if (!dbReady) {
-      console.log("Database not initialized, returning empty array")
-      return NextResponse.json([])
+      return NextResponse.json({ error: "Database not initialized" }, { status: 503 })
     }
 
     const supabase = await getSupabaseServerClient()
-
-    const { data, error } = await supabase.from("rooms").select("*").order("name")
+    const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {
       console.error("Supabase error:", error)
-      return NextResponse.json({ error: "Erreur lors de la récupération des salles" }, { status: 500 })
+      return NextResponse.json({ error: "Salle non trouvée" }, { status: 404 })
     }
 
-    return NextResponse.json(data || [])
+    return NextResponse.json(data)
   } catch (error) {
     console.error("Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
 
-export async function POST(request: Request) {
+// PUT (update) a room by ID
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { name, description, capacity, price_per_day, image_url, amenities, available, reserved } = body
 
@@ -40,68 +42,64 @@ export async function POST(request: Request) {
     const dbReady = await isDatabaseInitialized()
 
     if (!dbReady) {
-      console.log(" Database not initialized, simulating success")
-      return NextResponse.json(
-        {
-          id: Math.random().toString(36).substring(7),
-          name,
-          description,
-          capacity,
-          price_per_day,
-          image_url,
-          amenities,
-          available,
-          reserved: reserved ?? false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        { status: 201 },
-      )
+      return NextResponse.json({ error: "Database not initialized" }, { status: 503 })
     }
 
-    try {
-      const supabase = await getSupabaseServerClient()
+    const supabase = await getSupabaseServerClient()
 
-      const { data, error } = await supabase
-        .from("rooms")
-        .insert({
-          name,
-          description,
-          capacity,
-          price_per_day,
-          image_url,
-          amenities,
-          available,
-          reserved: reserved ?? false,
-        })
-        .select()
-        .single()
+    const { data, error } = await supabase
+      .from("rooms")
+      .update({
+        name,
+        description,
+        capacity,
+        price_per_day,
+        image_url,
+        amenities,
+        available,
+        reserved: reserved ?? false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single()
 
-      if (error) {
-        console.error("Supabase error:", error)
-        return NextResponse.json({ error: "Erreur lors de la création de la salle" }, { status: 500 })
-      }
-
-      return NextResponse.json(data, { status: 201 })
-    } catch (error) {
-      console.log("Supabase error, simulating success")
-      return NextResponse.json(
-        {
-          id: Math.random().toString(36).substring(7),
-          name,
-          description,
-          capacity,
-          price_per_day,
-          image_url,
-          amenities,
-          available,
-          reserved: reserved ?? false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        { status: 201 },
-      )
+    if (error) {
+      console.error("Supabase error:", error)
+      return NextResponse.json({ error: "Erreur lors de la mise à jour de la salle" }, { status: 500 })
     }
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error("Request error:", error)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
+  }
+}
+
+// DELETE a room by ID
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const { id } = await params
+    const dbReady = await isDatabaseInitialized()
+
+    if (!dbReady) {
+      return NextResponse.json({ error: "Database not initialized" }, { status: 503 })
+    }
+
+    const supabase = await getSupabaseServerClient()
+
+    // First, delete all reservations for this room
+    await supabase.from("reservations").delete().eq("room_id", id)
+
+    // Then delete the room
+    const { error } = await supabase.from("rooms").delete().eq("id", id)
+
+    if (error) {
+      console.error("Supabase error:", error)
+      return NextResponse.json({ error: "Erreur lors de la suppression de la salle" }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
