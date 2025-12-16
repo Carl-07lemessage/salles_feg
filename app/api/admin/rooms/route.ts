@@ -32,15 +32,21 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name, description, capacity, price_per_day, image_url, amenities, available, reserved } = body
 
+    console.log("[v0] Creating room with data:", { name, capacity, price_per_day })
+
     // Validate required fields
     if (!name || !capacity || !price_per_day) {
       return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 })
     }
 
+    if (price_per_day > 99999999 || price_per_day < 0) {
+      return NextResponse.json({ error: "Le prix doit être entre 0 et 99,999,999 FCFA" }, { status: 400 })
+    }
+
     const dbReady = await isDatabaseInitialized()
 
     if (!dbReady) {
-      console.log(" Database not initialized, simulating success")
+      console.log("[v0] Database not initialized, simulating success")
       return NextResponse.json(
         {
           id: Math.random().toString(36).substring(7),
@@ -78,13 +84,14 @@ export async function POST(request: Request) {
         .single()
 
       if (error) {
-        console.error("Supabase error:", error)
+        console.error("[v0] Supabase error:", error)
         return NextResponse.json({ error: "Erreur lors de la création de la salle" }, { status: 500 })
       }
 
+      console.log("[v0] Room created successfully:", data.id)
       return NextResponse.json(data, { status: 201 })
     } catch (error) {
-      console.log("Supabase error, simulating success")
+      console.log("[v0] Supabase error, simulating success")
       return NextResponse.json(
         {
           id: Math.random().toString(36).substring(7),
@@ -103,7 +110,7 @@ export async function POST(request: Request) {
       )
     }
   } catch (error) {
-    console.error("Request error:", error)
+    console.error("[v0] Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
