@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { format, differenceInDays } from "date-fns"
 import { fr } from "date-fns/locale"
-import { Calendar, Mail, Phone, User, Building2 } from "lucide-react"
+import { Calendar, Mail, Phone, User, Building2, FileText } from "lucide-react"
+// </CHANGE>
 import { useState } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -46,6 +47,11 @@ export function ReservationDetailsDialog({ reservation, open, onOpenChange }: Re
       setIsUpdating(false)
     }
   }
+
+  const handleViewInvoice = () => {
+    window.open(`/admin/invoices/${reservation.id}`, "_blank")
+  }
+  // </CHANGE>
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -143,9 +149,17 @@ export function ReservationDetailsDialog({ reservation, open, onOpenChange }: Re
             </div>
           )}
 
+          <div className="pt-4 border-t">
+            <Button onClick={handleViewInvoice} variant="outline" className="w-full gap-2 bg-transparent">
+              <FileText className="h-4 w-4" />
+              Voir et imprimer la facture
+            </Button>
+          </div>
+          {/* </CHANGE> */}
+
           {/* Actions */}
           {reservation.status === "pending" && (
-            <div className="flex gap-3 pt-4 border-t">
+            <div className="flex gap-3">
               <Button
                 onClick={() => handleStatusUpdate("confirmed")}
                 disabled={isUpdating}
