@@ -97,7 +97,7 @@ export function Invoice({ reservation, invoiceNumber }: InvoiceProps) {
           <div className="text-right">
             <p className="font-semibold text-lg">Fédération des Entreprises du Gabon</p>
             <p className="text-sm text-muted-foreground mt-1">Libreville, Gabon</p>
-            <p className="text-sm text-muted-foreground">info@feg-gabon.org</p>
+            <p className="text-sm text-muted-foreground">info@lafeg.ga</p>
           </div>
         </div>
 
