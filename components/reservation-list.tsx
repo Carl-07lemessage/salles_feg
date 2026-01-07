@@ -5,7 +5,8 @@ import type { Reservation } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
+import { Eye, FileText } from "lucide-react"
+// </CHANGE>
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import { ReservationDetailsDialog } from "@/components/reservation-details-dialog"
@@ -16,9 +17,6 @@ interface ReservationListProps {
 }
 
 export function ReservationList({ reservations }: ReservationListProps) {
-  console.log("ReservationList received", reservations.length, "reservations")
-  // </CHANGE>
-
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -28,13 +26,15 @@ export function ReservationList({ reservations }: ReservationListProps) {
     return reservation.status === statusFilter
   })
 
-  console.log("After filtering by", statusFilter, ":", filteredReservations.length, "reservations")
-  // </CHANGE>
-
   const handleViewDetails = (reservation: Reservation) => {
     setSelectedReservation(reservation)
     setDialogOpen(true)
   }
+
+  const handleViewInvoice = (reservationId: string) => {
+    window.open(`/admin/invoices/${reservationId}`, "_blank")
+  }
+  // </CHANGE>
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -109,9 +109,25 @@ export function ReservationList({ reservations }: ReservationListProps) {
                   <TableCell>{reservation.total_price.toLocaleString("fr-FR")} FCFA</TableCell>
                   <TableCell>{getStatusBadge(reservation.status)}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleViewDetails(reservation)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleViewDetails(reservation)}
+                        title="Voir les détails"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleViewInvoice(reservation.id)}
+                        title="Voir la facture"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {/* </CHANGE> */}
                   </TableCell>
                 </TableRow>
               ))
