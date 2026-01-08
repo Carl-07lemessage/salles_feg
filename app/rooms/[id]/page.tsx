@@ -97,7 +97,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                   </div>
                   <div className="flex items-center gap-5">
                     <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <span className="text-3xl font-bold text-primary">₣</span>
+                      <span className="text-3xl font-bold text-primary">F</span>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground font-semibold uppercase tracking-wide mb-1">
