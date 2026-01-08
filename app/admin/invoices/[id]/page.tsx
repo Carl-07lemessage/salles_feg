@@ -3,18 +3,24 @@ import { Invoice } from "@/components/invoice"
 import { notFound } from "next/navigation"
 import type { Reservation } from "@/lib/types"
 
-export default async function InvoicePage({ params }: { params: { id: string } }) {
+export default async function InvoicePage(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  if (!id) {
+    notFound()
+  }
+
   const supabase = await getSupabaseServerClient()
 
   const { data: reservation, error } = await supabase
     .from("reservations")
-    .select(
-      `
+    .select(`
       *,
       room:rooms(*)
-    `,
-    )
-    .eq("id", params.id)
+    `)
+    .eq("id", id)
     .single()
 
   if (error || !reservation) {
