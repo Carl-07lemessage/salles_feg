@@ -1,3 +1,4 @@
+
 import { getSupabaseServerClient } from "@/lib/supabase-server"
 import type { Room } from "@/lib/types"
 import { RoomList } from "@/components/room-list"

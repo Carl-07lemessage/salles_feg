@@ -62,6 +62,9 @@ export async function POST(request: Request) {
       breakfast_option,
       coffee_break_selected,
       number_of_guests,
+      is_half_day,
+      room_price_original,
+      room_price_applied,
     } = body
 
     if (
@@ -149,6 +152,9 @@ export async function POST(request: Request) {
           breakfast_option: breakfast_option || null,
           coffee_break_selected: coffee_break_selected || false,
           number_of_guests: number_of_guests || 1,
+          is_half_day: is_half_day || false,
+          room_price_original: room_price_original || null,
+          room_price_applied: room_price_applied || null,
           status: "pending",
         })
         .select()
@@ -181,8 +187,8 @@ export async function POST(request: Request) {
           numberOfGuests: number_of_guests,
         }
 
-        // Envoyer les emails en parallèle (ne pas bloquer la réponse)
-        Promise.all([sendCustomerConfirmationEmail(emailData), sendAdminNotificationEmail(emailData)]).catch(
+        // Envoyer les emails en parallèle et attendre la fin pour garantir l'envoi sur Vercel
+        await Promise.all([sendCustomerConfirmationEmail(emailData), sendAdminNotificationEmail(emailData)]).catch(
           (error) => {
             console.error("Erreur lors de l'envoi des emails:", error)
           },

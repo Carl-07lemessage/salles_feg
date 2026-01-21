@@ -31,6 +31,12 @@ export interface Reservation {
   breakfast_option?: number | null // 1, 2, or 3
   coffee_break_selected?: boolean
   number_of_guests?: number
+  // Price adjustment fields
+  is_half_day?: boolean // True if reservation is 5 hours or less (50% discount)
+  room_price_original?: number // Original room price without discount
+  room_price_applied?: number // Room price applied (with half-day discount if applicable)
+  admin_adjusted_price?: number | null // Final price adjusted by admin (null if not modified)
+  admin_price_note?: string | null // Admin note explaining price adjustment
   created_at: string
   updated_at: string
   room?: Room
