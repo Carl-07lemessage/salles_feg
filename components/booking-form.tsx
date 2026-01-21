@@ -98,18 +98,39 @@ export function BookingForm({ room }: BookingFormProps) {
   }
   // </CHANGE>
 
-  const calculateTotalPrice = () => {
-    if (!dateRange?.from || !dateRange?.to) return 0
+  // Calculate if this is a half-day booking (5 hours or less)
+  const calculateHoursBooked = () => {
+    const start = Number.parseInt(startHour)
+    const end = Number.parseInt(endHour)
+    return end - start
+  }
+
+  const isHalfDay = () => {
+    const hours = calculateHoursBooked()
+    return hours >= 1 && hours <= 5
+  }
+
+  const calculateRoomCost = () => {
+    if (!dateRange?.from || !dateRange?.to) return { original: 0, applied: 0, isHalfDay: false }
     const days = differenceInDays(dateRange.to, dateRange.from) + 1
-    const roomCost = days * room.price_per_day
+    const originalCost = days * room.price_per_day
+    const halfDay = isHalfDay()
+    // Apply 50% discount for half-day bookings (5 hours or less)
+    const appliedCost = halfDay ? originalCost * 0.5 : originalCost
+    return { original: originalCost, applied: appliedCost, isHalfDay: halfDay }
+  }
+
+  const calculateTotalPrice = () => {
+    const { applied: roomCostApplied } = calculateRoomCost()
     const cateringCost = calculateCateringCost()
-    return roomCost + cateringCost
+    return roomCostApplied + cateringCost
   }
 
   const totalPrice = calculateTotalPrice()
   const numberOfDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0
   const cateringCost = calculateCateringCost()
-  const roomCost = numberOfDays * room.price_per_day
+  const { original: roomCostOriginal, applied: roomCost, isHalfDay: isHalfDayBooking } = calculateRoomCost()
+  const hoursBooked = calculateHoursBooked()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -164,7 +185,10 @@ export function BookingForm({ room }: BookingFormProps) {
           breakfast_option: cateringOptions.breakfastOption,
           coffee_break_selected: cateringOptions.coffeeBreakSelected,
           number_of_guests: formData.numberOfGuests,
-          // </CHANGE>
+          // Half-day pricing fields
+          is_half_day: isHalfDayBooking,
+          room_price_original: roomCostOriginal,
+          room_price_applied: roomCost,
         }),
       })
 
@@ -194,10 +218,10 @@ export function BookingForm({ room }: BookingFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Customer Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Nom complet *</Label>
+            <Label htmlFor="name">Nom de l'entreprise *</Label>
             <Input
               id="name"
-              placeholder="Jean Dupont"
+              placeholder="Nom de l'entreprise"
               value={formData.customerName}
               onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
               required
@@ -242,7 +266,7 @@ export function BookingForm({ room }: BookingFormProps) {
             />
           </div>
 
-          {/* Number of Guests */}
+          {/* Number of Guests*/}
           <div className="space-y-2">
             <Label htmlFor="guests">Nombre de participants *</Label>
             <Input
@@ -446,9 +470,27 @@ export function BookingForm({ room }: BookingFormProps) {
 
           {totalPrice > 0 && (
             <div className="rounded-lg bg-muted p-4 space-y-2">
+              {/* Half-day discount indicator */}
+              {isHalfDayBooking && (
+                <div className="flex items-center gap-2 p-2 bg-green-100 dark:bg-green-900/30 rounded-md mb-2">
+                  <span className="text-green-700 dark:text-green-400 text-sm font-medium">
+                    Tarif demi-journée appliqué (-50%)
+                  </span>
+                  <span className="text-xs text-green-600 dark:text-green-500">
+                    ({hoursBooked}h de réservation)
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Location de salle ({numberOfDays} jour{numberOfDays > 1 ? "s" : ""})</span>
-                <span>{roomCost.toLocaleString("fr-FR")} FCFA</span>
+                <span>Location de salle ({numberOfDays} jour{numberOfDays > 1 ? "s" : ""}, {hoursBooked}h)</span>
+                <div className="text-right">
+                  {isHalfDayBooking && (
+                    <span className="line-through text-xs mr-2">{roomCostOriginal.toLocaleString("fr-FR")} FCFA</span>
+                  )}
+                  <span className={isHalfDayBooking ? "text-green-600 dark:text-green-400 font-medium" : ""}>
+                    {roomCost.toLocaleString("fr-FR")} FCFA
+                  </span>
+                </div>
               </div>
               {cateringCost > 0 && (
                 <>

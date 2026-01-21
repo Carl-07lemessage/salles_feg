@@ -1,37 +1,71 @@
-import nodemailer from "nodemailer"
 import { getSupabaseAdminClient } from "@/lib/supabase-admin"
 
-const SMTP_USER = process.env.SMTP_USER || process.env.EMAIL_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
 
+// Lazy import nodemailer to avoid initialization errors
+let nodemailerModule: typeof import("nodemailer") | null = null
 let transporter: any = null
 
-function getTransporter() {
-  if (!transporter) {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
-      console.warn("Variables d'environnement EMAIL manquantes. Les emails ne seront pas envoyés.")
+async function getNodemailer() {
+  if (!nodemailerModule) {
+    try {
+      nodemailerModule = await import("nodemailer")
+    } catch (error) {
+      console.warn("Nodemailer not available:", error)
+      return null
+    }
+  }
+  return nodemailerModule
+}
+
+function getSmtpUser() {
+  return process.env.SMTP_USER || process.env.EMAIL_USER || ""
+}
+
+async function getTransporter() {
+  // Check for required environment variables first
+  const emailUser = process.env.EMAIL_USER
+  const emailPass = process.env.EMAIL_APP_PASSWORD
+  
+  if (!emailUser || !emailPass) {
+    console.warn("Variables d'environnement EMAIL manquantes. Les emails ne seront pas envoyés.")
+    return null
+  }
+
+  if (transporter) {
+    return transporter
+  }
+
+  try {
+    const nodemailer = await getNodemailer()
+    if (!nodemailer) {
       return null
     }
 
+    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com"
+    const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10)
+
     transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false,
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
+        user: emailUser,
+        pass: emailPass,
       },
     })
 
-    transporter.verify((error: any, success: boolean) => {
-      if (error) {
-        console.error("Erreur de vérification SMTP:", error)
-      } else {
-        console.log("Serveur SMTP prêt à envoyer des emails")
-      }
+    // Don't block on verify, just log
+    transporter.verify().then(() => {
+      console.log("Serveur SMTP prêt à envoyer des emails")
+    }).catch((error: any) => {
+      console.error("Erreur de vérification SMTP:", error)
     })
+
+    return transporter
+  } catch (error) {
+    console.error("Erreur lors de la création du transporteur SMTP:", error)
+    return null
   }
-  return transporter
 }
 
 interface ReservationEmailData {
@@ -144,14 +178,14 @@ function formatCateringOptions(data: ReservationEmailData): string {
 export async function sendCustomerConfirmationEmail(data: ReservationEmailData) {
   const { customerName, customerEmail, roomName, startDate, endDate, totalPrice, reservationId, customerPhone } = data
 
-  const emailTransporter = getTransporter()
+  const emailTransporter = await getTransporter()
   if (!emailTransporter) {
     console.warn("Email non envoyé - configuration manquante")
     return { success: false, error: "Email configuration missing" }
   }
 
   const mailOptions = {
-    from: `"Gestion des salles - FEG" <${SMTP_USER}>`,
+    from: `"Gestion des salles - FEG" <${getSmtpUser()}>`,
     to: customerEmail,
     subject: `Confirmation de réservation - ${roomName}`,
     html: `
@@ -304,7 +338,7 @@ export async function sendCustomerConfirmationEmail(data: ReservationEmailData) 
 export async function sendAdminNotificationEmail(data: ReservationEmailData) {
   const { customerName, customerEmail, roomName, startDate, endDate, totalPrice, reservationId, customerPhone, notes } = data
 
-  const emailTransporter = getTransporter()
+  const emailTransporter = await getTransporter()
   if (!emailTransporter) {
     console.warn("Email non envoyé - configuration manquante")
     return { success: false, error: "Email configuration missing" }
@@ -326,7 +360,7 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
   }
 
   const mailOptions = {
-    from: `"Gestion des salles - FEG" <${SMTP_USER}>`,
+    from: `"Gestion des salles - FEG" <${getSmtpUser()}>`,
     to: recipients,
     subject: `Nouvelle réservation - ${roomName}`,
     html: `
@@ -498,14 +532,14 @@ export async function sendAdminNotificationEmail(data: ReservationEmailData) {
 export async function sendCancellationEmail(data: ReservationEmailData) {
   const { customerName, customerEmail, roomName, startDate, endDate, reservationId } = data
 
-  const emailTransporter = getTransporter()
+  const emailTransporter = await getTransporter()
   if (!emailTransporter) {
     console.warn("Email non envoyé - configuration manquante")
     return { success: false, error: "Email configuration missing" }
   }
 
   const mailOptions = {
-    from: `"Gestion des salles - FEG" <${SMTP_USER}>`,
+    from: `"Gestion des salles - FEG" <${getSmtpUser()}>`,
     to: customerEmail,
     subject: `Annulation de réservation - ${roomName}`,
     html: `

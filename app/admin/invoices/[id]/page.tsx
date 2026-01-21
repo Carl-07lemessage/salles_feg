@@ -29,7 +29,7 @@ export default async function InvoicePage(
 
   return (
     <div className="min-h-screen bg-background">
-      <Invoice reservation={reservation as Reservation} />
+      <Invoice reservation={reservation as Reservation} isAdmin={true} />
     </div>
   )
 }
