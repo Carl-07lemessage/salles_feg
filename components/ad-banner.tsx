@@ -239,18 +239,18 @@ return (
     rel="noopener noreferrer"
     className={cn(
       baseClasses,
-      "group relative block overflow-hidden rounded-xl",
+      "group relative block overflow-hidden rounded-lg mx-24 py-28",
       className
     )}
   >
     {/* Image en background */}
     <AdImage
-      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300"
       sizes="(max-width: 640px) 100vw, 200px"
     />
 
     {/* Overlay (lisibilité du texte) */}
-    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors" />
+    <div className="absolute inset-0 bg-black/40 transition-colors" />
 
     {/* Contenu texte */}
     <div className="relative z-10 flex h-full flex-col justify-end p-4 sm:p-5">

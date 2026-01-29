@@ -43,13 +43,13 @@ async function getRooms(): Promise<Room[]> {
       .order("name")
 
     if (error) {
-      console.error("[v0] Erreur Supabase:", error)
+      console.error("Erreur Supabase:", error)
       return []
     }
 
     return data || []
   } catch (error: any) {
-    console.error("[v0] Erreur de connexion:", error)
+    console.error("Erreur de connexion:", error)
     return []
   }
 }
