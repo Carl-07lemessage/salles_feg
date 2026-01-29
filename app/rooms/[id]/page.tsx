@@ -1,7 +1,8 @@
 import { getSupabaseServerClient } from "@/lib/supabase-server"
-import type { Room } from "@/lib/types"
+import type { Room, Advertisement } from "@/lib/types"
 import { notFound } from "next/navigation"
 import { BookingForm } from "@/components/booking-form"
+import { AdBanner } from "@/components/ad-banner"
 import { Card, CardContent } from "@/components/ui/card"
 import { Users, CheckCircle2 } from "lucide-react"
 import Image from "next/image"
@@ -9,6 +10,33 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { getDirectImageUrl } from "@/lib/image-utils"
+
+// Ads feature flag - set to true after creating the advertisements table
+const ADS_ENABLED = true
+
+async function getAds(position: string): Promise<Advertisement[]> {
+  // Return empty array if ads are disabled or table doesn't exist yet
+  if (!ADS_ENABLED) return []
+  
+  try {
+    const supabase = await getSupabaseServerClient()
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from("advertisements")
+      .select("*")
+      .eq("position", position)
+      .eq("is_active", true)
+      .or(`start_date.is.null,start_date.lte.${now}`)
+      .or(`end_date.is.null,end_date.gte.${now}`)
+      .order("created_at", { ascending: false })
+      .limit(1)
+
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
+}
 
 async function getRoom(id: string): Promise<Room | null> {
   try {
@@ -33,7 +61,16 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
   if (!id) {
     notFound()
   }
+<<<<<<< HEAD
   const room = await getRoom(id)
+=======
+  
+  const [room, sidebarAds, bottomAds] = await Promise.all([
+    getRoom(id),
+    getAds("room_sidebar"),
+    getAds("room_bottom"),
+  ])
+>>>>>>> a5be95c (push publicitaire)
 
   if (!room) {
     notFound()
@@ -66,7 +103,11 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
           <div className="space-y-10">
             <div className="relative h-[420px] md:h-[540px] w-full rounded-2xl overflow-hidden bg-muted shadow-xl">
               <Image
+<<<<<<< HEAD
                 src={imageSrc}
+=======
+                src={imageSrc || "/placeholder.svg"}
+>>>>>>> a5be95c (push publicitaire)
                 alt={room.name}
                 fill
                 className="object-cover"
@@ -132,11 +173,23 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
             )}
           </div>
 
-          {/* Right Column - Booking Form */}
-          <div className="lg:sticky lg:top-28 h-fit">
+          {/* Right Column - Booking Form & Sidebar Ad */}
+          <div className="lg:sticky lg:top-28 h-fit space-y-6">
             <BookingForm room={room} />
+            
+            {/* Sidebar Ad */}
+            {sidebarAds.length > 0 && (
+              <AdBanner ad={sidebarAds[0]} variant="sidebar" priority="normal" />
+            )}
           </div>
         </div>
+
+        {/* Bottom Ad */}
+        {bottomAds.length > 0 && (
+          <div className="mt-12">
+            <AdBanner ad={bottomAds[0]} variant="card" priority="normal" />
+          </div>
+        )}
       </div>
     </div>
   )
