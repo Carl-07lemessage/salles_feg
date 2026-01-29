@@ -52,7 +52,7 @@ transporter.verify((error, success) => {
     console.log('✅ Connexion SMTP établie avec succès!\n');
     
     // Envoyer un email de test
-    console.log('📧 Envoi d\'un email de test...\n');
+    console.log('Envoi d\'un email de test...\n');
     
     const testEmail = {
       from: process.env.EMAIL_USER,

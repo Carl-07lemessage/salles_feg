@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error("Error fetching ads:", error)
+      console.error("[v0] Error fetching ads:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(filteredData || [])
   } catch (error: any) {
-    console.error("Ads fetch error:", error)
+    console.error("[v0] Ads fetch error:", error)
     return NextResponse.json({ error: "Failed to fetch ads" }, { status: 500 })
   }
 }
@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("Error creating ad:", error)
+      console.error("[v0] Error creating ad:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(data)
   } catch (error: any) {
-    console.error("Ad creation error:", error)
+    console.error("[v0] Ad creation error:", error)
     return NextResponse.json({ error: "Failed to create ad" }, { status: 500 })
   }
 }
