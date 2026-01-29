@@ -232,28 +232,38 @@ export const AdBanner = memo(function AdBanner({
 
   // HORIZONTAL VARIANT
   if (variant === "horizontal") {
-    return (
-      <div className={cn(baseClasses, "group", className)}>
-        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 sm:p-5">
-          <AdImage 
-            width="w-full sm:w-52" 
-            height="h-28 sm:h-24" 
-            sizes="(max-width: 640px) 100vw, 208px" 
-          />
-          <div className="flex-1 text-center sm:text-left space-y-1.5">
-            <AdLabel />
-            <h3 className="font-semibold text-foreground text-lg leading-tight">{ad.title}</h3>
-            {ad.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{ad.description}</p>
-            )}
-          </div>
-          <div className="shrink-0">
-            <ActionButton />
-          </div>
-        </div>
-        <CloseButton />
-      </div>
-    )
+return (
+  <a
+    href={ad.link}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={cn(
+      baseClasses,
+      "group relative block overflow-hidden rounded-xl",
+      className
+    )}
+  >
+    {/* Image en background */}
+    <AdImage
+      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      sizes="(max-width: 640px) 100vw, 200px"
+    />
+
+    {/* Overlay (lisibilité du texte) */}
+    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors" />
+
+    {/* Contenu texte */}
+    <div className="relative z-10 flex h-full flex-col justify-end p-4 sm:p-5">
+      <AdLabel />
+      <h3 className="mt-1 text-lg font-semibold text-white leading-tight">
+        {ad.title}
+      </h3>
+    </div>
+
+    <CloseButton />
+  </a>
+)
+
   }
 
   // VERTICAL / SIDEBAR VARIANT
