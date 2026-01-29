@@ -43,6 +43,32 @@ export interface Reservation {
 }
 // </CHANGE>
 
+export interface Advertisement {
+  id: string
+  title: string
+  description: string | null
+  image_url: string | null
+  link_url: string | null
+  link_text: string
+  position: "homepage_top" | "homepage_bottom" | "homepage_middle" | "room_sidebar" | "room_bottom" | "global_popup"
+  is_active: boolean
+  start_date: string | null
+  end_date: string | null
+  click_count: number
+  view_count: number
+  created_at: string
+  updated_at: string
+}
+
+export const AD_POSITIONS = {
+  homepage_top: { label: "Accueil - Haut", description: "Bannière horizontale en haut de page" },
+  homepage_bottom: { label: "Accueil - Bas", description: "Encart avant le footer" },
+  homepage_middle: { label: "Accueil - Milieu", description: "Encart entre les sections" },
+  room_sidebar: { label: "Salle - Latéral", description: "Colonne latérale droite" },
+  room_bottom: { label: "Salle - Bas", description: "Sous le formulaire de réservation" },
+  global_popup: { label: "Popup global", description: "Popup promotionnel sur toutes les pages" },
+}
+
 export const CATERING_OPTIONS = {
   lunch: {
     price: 25000,

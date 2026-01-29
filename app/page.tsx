@@ -1,9 +1,36 @@
-
 import { getSupabaseServerClient } from "@/lib/supabase-server"
-import type { Room } from "@/lib/types"
+import type { Room, Advertisement } from "@/lib/types"
 import { RoomList } from "@/components/room-list"
+import { AdBanner } from "@/components/ad-banner"
 import { Building2 } from "lucide-react"
 import Image from "next/image"
+
+// Ads feature flag - set to true after creating the advertisements table
+const ADS_ENABLED = true
+
+async function getAds(position: string): Promise<Advertisement[]> {
+  // Return empty array if ads are disabled or table doesn't exist yet
+  if (!ADS_ENABLED) return []
+  
+  try {
+    const supabase = await getSupabaseServerClient()
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from("advertisements")
+      .select("*")
+      .eq("position", position)
+      .eq("is_active", true)
+      .or(`start_date.is.null,start_date.lte.${now}`)
+      .or(`end_date.is.null,end_date.gte.${now}`)
+      .order("created_at", { ascending: false })
+      .limit(1)
+
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
+}
 
 async function getRooms(): Promise<Room[]> {
   try {
@@ -28,11 +55,22 @@ async function getRooms(): Promise<Room[]> {
 }
 
 export default async function HomePage() {
-  const rooms = await getRooms()
+  const [rooms, topAds, bottomAds] = await Promise.all([
+    getRooms(),
+    getAds("homepage_top"),
+    getAds("homepage_bottom"),
+  ])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-accent/20 to-white">
-      <section className="relative  overflow-hidden">
+      {/* Top Ad Banner */}
+      {topAds.length > 0 && (
+        <div className="container mx-auto px-4 pt-4">
+          <AdBanner ad={topAds[0]} variant="horizontal" priority="high" />
+        </div>
+      )}
+
+      <section className="relative overflow-hidden">
         {/*Image d’arrière-plan*/}
         <img
           src="/logo-feg.png"
@@ -61,6 +99,13 @@ export default async function HomePage() {
       <section className="container mx-auto px-4 py-12 md:py-20">
         <RoomList initialRooms={rooms} />
       </section>
+
+      {/* Bottom Ad Banner */}
+      {bottomAds.length > 0 && (
+        <div className="container mx-auto px-4 pb-8">
+          <AdBanner ad={bottomAds[0]} variant="horizontal" />
+        </div>
+      )}
 
       <footer className="border-t border-border/50 bg-muted/30 mt-20">
         <div className="container mx-auto px-4 py-10">
