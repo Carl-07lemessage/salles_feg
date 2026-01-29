@@ -30,11 +30,11 @@ export async function POST(request: Request) {
     const base64 = buffer.toString("base64")
     const dataUrl = `data:${file.type};base64,${base64}`
 
-    console.log("[v0] File converted to base64 successfully")
+    console.log("File converted to base64 successfully")
 
     return NextResponse.json({ url: dataUrl })
   } catch (error) {
-    console.error("[v0] Upload error:", error)
+    console.error("Upload error:", error)
     return NextResponse.json(
       { error: `Erreur lors du téléchargement: ${error instanceof Error ? error.message : "Erreur inconnue"}` },
       { status: 500 },

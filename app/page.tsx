@@ -1,5 +1,4 @@
-
-import { getSupabaseServerClient } from "@/lib/supabase-server"
+import { getSupabaseStatic } from "@/lib/proxy"
 import type { Room, Advertisement } from "@/lib/types"
 import { RoomList } from "@/components/room-list"
 import { AdBanner } from "@/components/ad-banner"
@@ -9,12 +8,14 @@ import Image from "next/image"
 // Ads feature flag - set to true after creating the advertisements table
 const ADS_ENABLED = true
 
+export const revalidate = 3600 // Revalidation toutes les heures
+
 async function getAds(position: string): Promise<Advertisement[]> {
   // Return empty array if ads are disabled or table doesn't exist yet
   if (!ADS_ENABLED) return []
   
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from("advertisements")
@@ -35,7 +36,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
 
 async function getRooms(): Promise<Room[]> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const { data, error } = await supabase
       .from("rooms")
       .select("*")
@@ -44,13 +45,13 @@ async function getRooms(): Promise<Room[]> {
       .order("name")
 
     if (error) {
-      console.error("[v0] Erreur Supabase:", error)
+      console.error("Erreur Supabase:", error)
       return []
     }
 
     return data || []
   } catch (error: any) {
-    console.error("[v0] Erreur de connexion:", error)
+    console.error("Erreur de connexion:", error)
     return []
   }
 }
@@ -64,16 +65,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-accent/20 to-white">
-<<<<<<< HEAD
-      <section className="relative  overflow-hidden">
-        {/*Image d’arrière-plan*/}
-        <img
-          src="/logo-feg.png"
-          alt="FEG Logo"
-          className="absolute inset-0 w-full h-full mt-4 object-contain opacity-10 pointer-events-none"
-        />
-
-=======
       {/* Top Ad Banner */}
       {topAds.length > 0 && (
         <div className="container mx-auto px-4 pt-4">
@@ -89,7 +80,6 @@ export default async function HomePage() {
           className="absolute inset-0 w-full h-full mt-4 object-contain opacity-10 pointer-events-none"
         />
 
->>>>>>> a5be95c (push publicitaire)
         {/* Contenu principal */}
         <div className="relative container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">

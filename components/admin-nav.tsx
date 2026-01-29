@@ -4,11 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-<<<<<<< HEAD
-import { Building2, Calendar, LogOut, Menu, X, BookOpen } from "lucide-react"
-=======
 import { Building2, Calendar, LogOut, Menu, X, BookOpen, Megaphone } from "lucide-react"
->>>>>>> a5be95c (push publicitaire)
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -52,14 +48,11 @@ export function AdminNav() {
       label: "Guide",
       icon: BookOpen,
     },
-<<<<<<< HEAD
-=======
     {
       href: "/admin/ads",
       label: "Publicités",
       icon: Megaphone,
     },
->>>>>>> a5be95c (push publicitaire)
   ]
 
   return (

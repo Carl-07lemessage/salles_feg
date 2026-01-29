@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-
-"use client"
-=======
->>>>>>> a5be95c (push publicitaire)
 import { AdminNav } from "@/components/admin-nav"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {

@@ -13,13 +13,14 @@ import { getDirectImageUrl } from "@/lib/image-utils"
 
 // Ads feature flag - set to true after creating the advertisements table
 const ADS_ENABLED = true
+export const revalidate = 3600
 
 async function getAds(position: string): Promise<Advertisement[]> {
   // Return empty array if ads are disabled or table doesn't exist yet
   if (!ADS_ENABLED) return []
   
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from("advertisements")
@@ -40,7 +41,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
 
 async function getRoom(id: string): Promise<Room | null> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {
@@ -61,16 +62,12 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
   if (!id) {
     notFound()
   }
-<<<<<<< HEAD
-  const room = await getRoom(id)
-=======
   
   const [room, sidebarAds, bottomAds] = await Promise.all([
     getRoom(id),
     getAds("room_sidebar"),
     getAds("room_bottom"),
   ])
->>>>>>> a5be95c (push publicitaire)
 
   if (!room) {
     notFound()
@@ -103,11 +100,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
           <div className="space-y-10">
             <div className="relative h-[420px] md:h-[540px] w-full rounded-2xl overflow-hidden bg-muted shadow-xl">
               <Image
-<<<<<<< HEAD
-                src={imageSrc}
-=======
                 src={imageSrc || "/placeholder.svg"}
->>>>>>> a5be95c (push publicitaire)
                 alt={room.name}
                 fill
                 className="object-cover"

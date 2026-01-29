@@ -43,8 +43,6 @@ export interface Reservation {
 }
 // </CHANGE>
 
-<<<<<<< HEAD
-=======
 export interface Advertisement {
   id: string
   title: string
@@ -71,7 +69,6 @@ export const AD_POSITIONS = {
   global_popup: { label: "Popup global", description: "Popup promotionnel sur toutes les pages" },
 }
 
->>>>>>> a5be95c (push publicitaire)
 export const CATERING_OPTIONS = {
   lunch: {
     price: 25000,
