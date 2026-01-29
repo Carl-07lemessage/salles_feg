@@ -1,4 +1,4 @@
-import { getSupabaseServerClient } from "@/lib/supabase-server"
+import { getSupabaseAuth } from "@/lib/proxy"
 import type { Room } from "@/lib/types"
 import { RoomManagementTable } from "@/components/room-management-table"
 import { Button } from "@/components/ui/button"
@@ -7,7 +7,7 @@ import Link from "next/link"
 
 async function getRooms(): Promise<Room[]> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = await getSupabaseAuth()
     const { data, error } = await supabase.from("rooms").select("*").order("created_at", { ascending: false })
 
     if (error) {

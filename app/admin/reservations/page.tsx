@@ -1,4 +1,4 @@
-import { getSupabaseServerClient } from "@/lib/supabase-server"
+import { getSupabaseAuth } from "@/lib/proxy"
 import type { Reservation } from "@/lib/types"
 import { ReservationDashboard } from "@/components/reservation-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -8,7 +8,7 @@ import { YearlyReservationView } from "@/components/yearly-reservation-view"
 
 async function getReservations(): Promise<Reservation[]> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = await getSupabaseAuth()
     const { data, error } = await supabase
       .from("reservations")
       .select(

@@ -13,13 +13,14 @@ import { getDirectImageUrl } from "@/lib/image-utils"
 
 // Ads feature flag - set to true after creating the advertisements table
 const ADS_ENABLED = true
+export const revalidate = 3600
 
 async function getAds(position: string): Promise<Advertisement[]> {
   // Return empty array if ads are disabled or table doesn't exist yet
   if (!ADS_ENABLED) return []
   
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from("advertisements")
@@ -40,7 +41,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
 
 async function getRoom(id: string): Promise<Room | null> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {

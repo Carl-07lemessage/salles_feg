@@ -1,4 +1,4 @@
-import { getSupabaseServerClient } from "@/lib/supabase-server"
+import { getSupabaseStatic } from "@/lib/proxy"
 import type { Room, Advertisement } from "@/lib/types"
 import { RoomList } from "@/components/room-list"
 import { AdBanner } from "@/components/ad-banner"
@@ -8,12 +8,14 @@ import Image from "next/image"
 // Ads feature flag - set to true after creating the advertisements table
 const ADS_ENABLED = true
 
+export const revalidate = 3600 // Revalidation toutes les heures
+
 async function getAds(position: string): Promise<Advertisement[]> {
   // Return empty array if ads are disabled or table doesn't exist yet
   if (!ADS_ENABLED) return []
   
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from("advertisements")
@@ -34,7 +36,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
 
 async function getRooms(): Promise<Room[]> {
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = getSupabaseStatic()
     const { data, error } = await supabase
       .from("rooms")
       .select("*")
