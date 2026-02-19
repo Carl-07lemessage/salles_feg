@@ -20,7 +20,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
   if (!ADS_ENABLED) return []
   
   try {
-    const supabase = getSupabaseStatic()
+    const supabase = await getSupabaseServerClient()
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from("advertisements")
@@ -41,7 +41,7 @@ async function getAds(position: string): Promise<Advertisement[]> {
 
 async function getRoom(id: string): Promise<Room | null> {
   try {
-    const supabase = getSupabaseStatic()
+    const supabase = await getSupabaseServerClient()
     const { data, error } = await supabase.from("rooms").select("*").eq("id", id).single()
 
     if (error) {

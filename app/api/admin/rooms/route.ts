@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name, description, capacity, price_per_day, image_url, amenities, available, reserved } = body
 
-    console.log("[v0] Creating room with data:", { name, capacity, price_per_day })
+    console.log("Creating room with data:", { name, capacity, price_per_day })
 
     // Validate required fields
     if (!name || !capacity || !price_per_day) {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const dbReady = await isDatabaseInitialized()
 
     if (!dbReady) {
-      console.log("[v0] Database not initialized, simulating success")
+      console.log("Database not initialized, simulating success")
       return NextResponse.json(
         {
           id: Math.random().toString(36).substring(7),
@@ -84,14 +84,14 @@ export async function POST(request: Request) {
         .single()
 
       if (error) {
-        console.error("[v0] Supabase error:", error)
+        console.error("Supabase error:", error)
         return NextResponse.json({ error: "Erreur lors de la création de la salle" }, { status: 500 })
       }
 
-      console.log("[v0] Room created successfully:", data.id)
+      console.log("Room created successfully:", data.id)
       return NextResponse.json(data, { status: 201 })
     } catch (error) {
-      console.log("[v0] Supabase error, simulating success")
+      console.log("Supabase error, simulating success")
       return NextResponse.json(
         {
           id: Math.random().toString(36).substring(7),
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       )
     }
   } catch (error) {
-    console.error("[v0] Request error:", error)
+    console.error("Request error:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
