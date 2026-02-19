@@ -2,17 +2,17 @@ import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    console.log("[v0] Starting file upload")
+    console.log("Starting file upload")
 
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 
     if (!file) {
-      console.log("[v0] No file provided")
+      console.log("No file provided")
       return NextResponse.json({ error: "Aucun fichier fourni" }, { status: 400 })
     }
 
-    console.log("[v0] File received:", file.name, file.type, file.size)
+    console.log("File received:", file.name, file.type, file.size)
 
     // Validate file type
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]
