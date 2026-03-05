@@ -62,7 +62,8 @@ export function RoomList({ initialRooms }: RoomListProps) {
   }, [initialRooms, filters])
 
   return (
-    <div className="grid lg:grid-cols-[300px_1fr] gap-4">
+    // J'AI ENLEVÉ LE GRID (lg:grid-cols-[300px_1fr]) POUR AVOIR UNE INTERFACE SANS FILTRES SUR LA PAGE D'ACCUEIL
+    <div className="grid  gap-2">
       {/* Filters Sidebar */}
       <aside className="lg:sticky lg:top-4 h-fit">
         <RoomFilters onFilterChange={setFilters} />
