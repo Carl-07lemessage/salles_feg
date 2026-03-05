@@ -95,12 +95,12 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
       </header>
 
       <div className="container mx-auto px-4 py-10 md:py-16">
-        <div className="grid lg:grid-cols-[1fr_440px] gap-10 lg:gap-16">
+        <div className="grid lg:grid-cols-[1fr_440px] gap-6 lg:gap-10">
           {/* Left Column - Room Details */}
           <div className="space-y-10">
             <div className="relative h-[420px] md:h-[540px] w-full rounded-2xl overflow-hidden bg-muted shadow-xl">
               <Image
-                src={imageSrc || "/placeholder.svg"}
+                src={imageSrc || "/logo-feg.png"}
                 alt={room.name}
                 fill
                 className="object-cover"
