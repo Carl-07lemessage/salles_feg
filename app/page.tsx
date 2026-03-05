@@ -141,7 +141,7 @@ export default async function HomePage() {
       src="/section.png"
       alt="Salle prestige"
       fill
-      className="object-cover optional:0"
+      className="object-cover"
       priority
       quality={100}
     />
