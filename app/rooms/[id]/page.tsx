@@ -18,7 +18,7 @@ export const revalidate = 3600
 async function getAds(position: string): Promise<Advertisement[]> {
   // Return empty array if ads are disabled or table doesn't exist yet
   if (!ADS_ENABLED) return []
-  
+
   try {
     const supabase = await getSupabaseServerClient()
     const now = new Date().toISOString()
@@ -62,7 +62,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
   if (!id) {
     notFound()
   }
-  
+
   const [room, sidebarAds, bottomAds] = await Promise.all([
     getRoom(id),
     getAds("room_sidebar"),
@@ -169,7 +169,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
           {/* Right Column - Booking Form & Sidebar Ad */}
           <div className="lg:sticky lg:top-28 h-fit space-y-6">
             <BookingForm room={room} />
-            
+
             {/* Sidebar Ad */}
             {sidebarAds.length > 0 && (
               <AdBanner ad={sidebarAds[0]} variant="sidebar" priority="normal" />
