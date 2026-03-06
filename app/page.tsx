@@ -137,7 +137,7 @@ export default async function HomePage() {
           {/* Image d'arrière-plan */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="/section.jpg"
+              src="/Section.jpg"
               alt="Salle prestige"
               fill
               className="object-cover"
@@ -194,8 +194,7 @@ export default async function HomePage() {
 
               {/* Description */}
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 font-light max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-in-up animation-delay-200 px-4">
-                Des espaces d'exception où le raffinement rencontre la
-                fonctionnalité, pour des moments professionnels inoubliables.
+                Des espaces modernes et bien équipés pour accueillir vos réunions, formations et événements professionnels dans un cadre confortable et fonctionnel.
               </p>
             </div>
           </div>
